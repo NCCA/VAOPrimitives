@@ -27,9 +27,6 @@ NGLScene::NGLScene(QWindow *_parent) : OpenGLWindow(_parent)
   m_spinXFace=0;
   m_spinYFace=0;
   setTitle("VAOPrimitives Demo");
-  // this timer is going to trigger an event every 40ms which will be processed in the
-  //
-  m_lightTimer =startTimer(40);
   m_animate=true;
 }
 
@@ -138,6 +135,10 @@ void NGLScene::initialize()
   prim->createTrianglePlane("plane",14,14,80,80,ngl::Vec3(0,1,0));
   // as re-size is not explicitly called we need to do this.
   glViewport(0,0,width(),height());
+  // this timer is going to trigger an event every 40ms which will be processed in the
+  //
+  m_lightTimer =startTimer(40);
+
 
 }
 
