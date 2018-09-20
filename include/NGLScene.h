@@ -1,9 +1,9 @@
 #ifndef NGLSCENE_H_
 #define NGLSCENE_H_
-#include <QOpenGLWindow>
 #include <ngl/Mat4.h>
 #include <ngl/Transformation.h>
 #include "WindowParams.h"
+#include <QOpenGLWindow>
 #include <memory>
 
 //----------------------------------------------------------------------------------------------------------------------
