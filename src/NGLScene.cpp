@@ -33,68 +33,64 @@ void NGLScene::initializeGL()
   // we need to initialise the NGL lib which will load all of the OpenGL functions, this must
   // be done once we have a valid GL context but before we call any GL commands. If we dont do
   // this everything will crash
-  ngl::NGLInit::instance();
+  ngl::NGLInit::initalize();
   glClearColor(0.4f, 0.4f, 0.4f, 1.0f);			   // Grey Background
   // enable depth testing for drawing
   glEnable(GL_DEPTH_TEST);
-
   m_lightAngle=0.0;
   m_lightPos.set(sinf(m_lightAngle),2,cosf(m_lightAngle));
   // now to load the shader and set the values
-  // grab an instance of shader manager
-  ngl::ShaderLib* shader = ngl::ShaderLib::instance();
   // we are creating a shader called PBR to save typos
   // in the code create some constexpr
   constexpr auto vertexShader  = "PBRVertex";
   constexpr auto fragShader    = "PBRFragment";
   // create the shader program
-  shader->createShaderProgram( shaderProgram );
+  ngl::ShaderLib::createShaderProgram( shaderProgram );
   // now we are going to create empty shaders for Frag and Vert
-  shader->attachShader( vertexShader, ngl::ShaderType::VERTEX );
-  shader->attachShader( fragShader, ngl::ShaderType::FRAGMENT );
+  ngl::ShaderLib::attachShader( vertexShader, ngl::ShaderType::VERTEX );
+  ngl::ShaderLib::attachShader( fragShader, ngl::ShaderType::FRAGMENT );
   // attach the source
-  shader->loadShaderSource( vertexShader, "shaders/PBRVertex.glsl" );
-  shader->loadShaderSource( fragShader, "shaders/PBRFragment.glsl" );
+  ngl::ShaderLib::loadShaderSource( vertexShader, "shaders/PBRVertex.glsl" );
+  ngl::ShaderLib::loadShaderSource( fragShader, "shaders/PBRFragment.glsl" );
   // compile the shaders
-  shader->compileShader( vertexShader );
-  shader->compileShader( fragShader );
+  ngl::ShaderLib::compileShader( vertexShader );
+  ngl::ShaderLib::compileShader( fragShader );
   // add them to the program
-  shader->attachShaderToProgram( shaderProgram, vertexShader );
-  shader->attachShaderToProgram( shaderProgram, fragShader );
+  ngl::ShaderLib::attachShaderToProgram( shaderProgram, vertexShader );
+  ngl::ShaderLib::attachShaderToProgram( shaderProgram, fragShader );
   // now we have associated that data we can link the shader
-  shader->linkProgramObject( shaderProgram );
+  ngl::ShaderLib::linkProgramObject( shaderProgram );
   // and make it active ready to load values
-  ( *shader )[ shaderProgram ]->use();
+  ngl::ShaderLib::use(shaderProgram );
  // We now create our view matrix for a static camera
   ngl::Vec3 from( 0.0f, 2.0f, 10.0f );
   ngl::Vec3 to( 0.0f, 0.0f, 0.0f );
   ngl::Vec3 up( 0.0f, 1.0f, 0.0f );
   // now load to our new camera
   m_view=ngl::lookAt(from,to,up);
-  shader->setUniform( "camPos", from );
+  ngl::ShaderLib::setUniform( "camPos", from );
   // now a light
   m_lightPos.set( 0.0, 2.0f, 2.0f ,1.0f);
   // setup the default shader material and light porerties
   // these are "uniform" so will retain their values
-  shader->setUniform("lightPosition",m_lightPos.toVec3());
-  shader->setUniform("lightColor",400.0f,400.0f,400.0f);
-  shader->setUniform("exposure",2.2f);
-  shader->setUniform("albedo",0.950f, 0.71f, 0.29f);
+  ngl::ShaderLib::setUniform("lightPosition",m_lightPos.toVec3());
+  ngl::ShaderLib::setUniform("lightColor",400.0f,400.0f,400.0f);
+  ngl::ShaderLib::setUniform("exposure",2.2f);
+  ngl::ShaderLib::setUniform("albedo",0.950f, 0.71f, 0.29f);
 
-  shader->setUniform("metallic",1.02f);
-  shader->setUniform("roughness",0.38f);
-  shader->setUniform("ao",0.2f);
+  ngl::ShaderLib::setUniform("metallic",1.02f);
+  ngl::ShaderLib::setUniform("roughness",0.38f);
+  ngl::ShaderLib::setUniform("ao",0.2f);
 
-  ngl::VAOPrimitives *prim=ngl::VAOPrimitives::instance();
-  prim->createSphere("sphere",0.5f,50);
+  ngl::VAOPrimitives::createSphere("sphere",0.5f,50);
 
-  prim->createCylinder("cylinder",0.5f,1.4f,40,40);
+  ngl::VAOPrimitives::createCylinder("cylinder",0.5f,1.4f,40,40);
 
-  prim->createCone("cone",0.5,1.4f,20,20);
+  ngl::VAOPrimitives::createCone("cone",0.5,1.4f,20,20);
 
-  prim->createDisk("disk",0.8f,120);
-  prim->createTorus("torus",0.15f,0.4f,40,40);
-  prim->createTrianglePlane("plane",14,14,80,80,ngl::Vec3(0,1,0));
+  ngl::VAOPrimitives::createDisk("disk",0.8f,120);
+  ngl::VAOPrimitives::createTorus("torus",0.15f,0.4f,40,40);
+  ngl::VAOPrimitives::createTrianglePlane("plane",14,14,80,80,ngl::Vec3(0,1,0));
   // as re-size is not explicitly called we need to do this.
   glViewport(0,0,width(),height());
   // this timer is going to trigger an event every 40ms which will be processed in the
@@ -107,8 +103,7 @@ void NGLScene::initializeGL()
 
 void NGLScene::loadMatricesToShader()
 {
-  ngl::ShaderLib* shader = ngl::ShaderLib::instance();
-    shader->use("PBR");
+    ngl::ShaderLib::use("PBR");
     struct transform
     {
       ngl::Mat4 MVP;
@@ -122,17 +117,15 @@ void NGLScene::loadMatricesToShader()
      t.MVP=m_project*t.M;
      t.normalMatrix=t.M;
      t.normalMatrix.inverse().transpose();
-     shader->setUniformBuffer("TransformUBO",sizeof(transform),&t.MVP.m_00);
+     ngl::ShaderLib::setUniformBuffer("TransformUBO",sizeof(transform),&t.MVP.m_00);
 
-     shader->setUniform("lightPosition",(m_mouseGlobalTX*m_lightPos).toVec3());
+     ngl::ShaderLib::setUniform("lightPosition",(m_mouseGlobalTX*m_lightPos).toVec3());
 
 }
 
 void NGLScene::drawScene(const std::string &_shader)
 {
-  // grab an instance of the shader manager
-  ngl::ShaderLib *shader=ngl::ShaderLib::instance();
-  (*shader)[_shader]->use();
+  ngl::ShaderLib::use(_shader);
   // clear the screen and depth buffer
   // Rotation based on the mouse position for our global
   // transform
@@ -148,55 +141,53 @@ void NGLScene::drawScene(const std::string &_shader)
   m_mouseGlobalTX.m_m[3][1] = m_modelPos.m_y;
   m_mouseGlobalTX.m_m[3][2] = m_modelPos.m_z;
 
-   // get the VBO instance and draw the built in teapot
-  ngl::VAOPrimitives *prim=ngl::VAOPrimitives::instance();
 
   m_transform.reset();
   {
     loadMatricesToShader();
-    prim->draw("teapot");
+    ngl::VAOPrimitives::draw("teapot");
   } // and before a pop
 
   m_transform.reset();
   {
     m_transform.setPosition(-3,0.0,0.0);
     loadMatricesToShader();
-    prim->draw("sphere");
+    ngl::VAOPrimitives::draw("sphere");
   } // and before a pop
 
   m_transform.reset();
   {
     m_transform.setPosition(3,0.0,0.0);
     loadMatricesToShader();
-    prim->draw("cylinder");
+    ngl::VAOPrimitives::draw("cylinder");
   } // and before a pop
 
   m_transform.reset();
   {
     m_transform.setPosition(0.0,0.0,3.0);
     loadMatricesToShader();
-    prim->draw("cube");
+    ngl::VAOPrimitives::draw("cube");
   } // and before a pop
 
   m_transform.reset();
   {
     m_transform.setPosition(-3.0,0.0,3.0);
     loadMatricesToShader();
-    prim->draw("torus");
+    ngl::VAOPrimitives::draw("torus");
   } // and before a pop
 
   m_transform.reset();
   {
     m_transform.setPosition(3.0,0.5,3.0);
     loadMatricesToShader();
-    prim->draw("icosahedron");
+    ngl::VAOPrimitives::draw("icosahedron");
   } // and before a pop
 
   m_transform.reset();
   {
     m_transform.setPosition(0.0,0.0,-3.0);
     loadMatricesToShader();
-    prim->draw("cone");
+    ngl::VAOPrimitives::draw("cone");
   } // and before a pop
 
 
@@ -204,7 +195,7 @@ void NGLScene::drawScene(const std::string &_shader)
   {
     m_transform.setPosition(-3.0,0.5,-3.0);
     loadMatricesToShader();
-    prim->draw("tetrahedron");
+    ngl::VAOPrimitives::draw("tetrahedron");
   } // and before a pop
 
 
@@ -212,7 +203,7 @@ void NGLScene::drawScene(const std::string &_shader)
   {
     m_transform.setPosition(3.0,0.5,-3.0);
     loadMatricesToShader();
-    prim->draw("octahedron");
+    ngl::VAOPrimitives::draw("octahedron");
   } // and before a pop
 
 
@@ -220,7 +211,7 @@ void NGLScene::drawScene(const std::string &_shader)
   {
     m_transform.setPosition(0.0,0.5,-6.0);
     loadMatricesToShader();
-    prim->draw("football");
+    ngl::VAOPrimitives::draw("football");
   } // and before a pop
 
   m_transform.reset();
@@ -228,7 +219,7 @@ void NGLScene::drawScene(const std::string &_shader)
     m_transform.setPosition(-3.0,0.5,-6.0);
     m_transform.setRotation(0,180,0);
     loadMatricesToShader();
-    prim->draw("disk");
+    ngl::VAOPrimitives::draw("disk");
   } // and before a pop
 
 
@@ -236,7 +227,7 @@ void NGLScene::drawScene(const std::string &_shader)
   {
     m_transform.setPosition(3.0f,0.5f,-6.0f);
     loadMatricesToShader();
-    prim->draw("dodecahedron");
+    ngl::VAOPrimitives::draw("dodecahedron");
   } // and before a pop
 
   m_transform.reset();
@@ -244,7 +235,7 @@ void NGLScene::drawScene(const std::string &_shader)
     m_transform.setPosition(1.0f,0.35f,1.0f);
     m_transform.setScale(1.5f,1.5f,1.5f);
     loadMatricesToShader();
-    prim->draw("troll");
+    ngl::VAOPrimitives::draw("troll");
   } // and before a pop
 
 #ifdef ADDLARGEMODELS
@@ -253,7 +244,7 @@ void NGLScene::drawScene(const std::string &_shader)
     m_transform.setPosition(-1.0,-0.5,1.0);
     m_transform.setScale(0.1f,0.1f,0.1f);
     loadMatricesToShader();
-    prim->draw("dragon");
+    ngl::VAOPrimitives::draw("dragon");
   } // and before a pop
 
   m_transform.reset();
@@ -261,7 +252,7 @@ void NGLScene::drawScene(const std::string &_shader)
     m_transform.setPosition(-2.5,-0.5,1.0);
     m_transform.setScale(0.1,0.1,0.1);
     loadMatricesToShader();
-    prim->draw("buddah");
+    ngl::VAOPrimitives::draw("buddah");
   } // and before a pop
 
   m_transform.reset();
@@ -269,7 +260,7 @@ void NGLScene::drawScene(const std::string &_shader)
     m_transform.setPosition(2.5,-0.5,1.0);
     m_transform.setScale(0.1,0.1,0.1);
     loadMatricesToShader();
-    prim->draw("bunny");
+    ngl::VAOPrimitives::draw("bunny");
   } // and before a pop
 #endif
 
@@ -277,7 +268,7 @@ void NGLScene::drawScene(const std::string &_shader)
   {
     m_transform.setPosition(0.0,-0.5,0.0);
     loadMatricesToShader();
-    prim->draw("plane");
+    ngl::VAOPrimitives::draw("plane");
   } // and before a pop
 
 
@@ -401,9 +392,8 @@ void NGLScene::keyPressEvent(QKeyEvent *_event)
 
 void NGLScene::updateLight()
 {
-  ngl::ShaderLib *shader=ngl::ShaderLib::instance();
 
-  (*shader)["Phong"]->use();
+  ngl::ShaderLib::use("Phong");
   // change the light angle
   m_lightAngle+=0.1;
 
