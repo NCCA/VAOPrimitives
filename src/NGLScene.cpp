@@ -19,8 +19,6 @@ NGLScene::~NGLScene()
   std::cout<<"Shutting down NGL, removing VAO's and Shaders\n";
 }
 
-
-
 void NGLScene::resizeGL( int _w, int _h )
 {
   m_project=ngl::perspective(45.0f, static_cast<float>( _w ) / _h, 0.05f, 350.0f );
@@ -33,7 +31,7 @@ void NGLScene::initializeGL()
   // we need to initialise the NGL lib which will load all of the OpenGL functions, this must
   // be done once we have a valid GL context but before we call any GL commands. If we dont do
   // this everything will crash
-  ngl::NGLInit::initalize();
+  ngl::NGLInit::initialize();
   glClearColor(0.4f, 0.4f, 0.4f, 1.0f);			   // Grey Background
   // enable depth testing for drawing
   glEnable(GL_DEPTH_TEST);
@@ -150,42 +148,42 @@ void NGLScene::drawScene(const std::string &_shader)
 
   m_transform.reset();
   {
-    m_transform.setPosition(-3,0.0,0.0);
+    m_transform.setPosition(-3.0f,0.0f,0.0f);
     loadMatricesToShader();
     ngl::VAOPrimitives::draw("sphere");
   } // and before a pop
 
   m_transform.reset();
   {
-    m_transform.setPosition(3,0.0,0.0);
+    m_transform.setPosition(3.0f,0.0f,0.0f);
     loadMatricesToShader();
     ngl::VAOPrimitives::draw("cylinder");
   } // and before a pop
 
   m_transform.reset();
   {
-    m_transform.setPosition(0.0,0.0,3.0);
+    m_transform.setPosition(0.0f,0.0f,3.0f);
     loadMatricesToShader();
     ngl::VAOPrimitives::draw("cube");
   } // and before a pop
 
   m_transform.reset();
   {
-    m_transform.setPosition(-3.0,0.0,3.0);
+    m_transform.setPosition(-3.0f,0.0f,3.0f);
     loadMatricesToShader();
     ngl::VAOPrimitives::draw("torus");
   } // and before a pop
 
   m_transform.reset();
   {
-    m_transform.setPosition(3.0,0.5,3.0);
+    m_transform.setPosition(3.0f,0.5f,3.0f);
     loadMatricesToShader();
     ngl::VAOPrimitives::draw("icosahedron");
   } // and before a pop
 
   m_transform.reset();
   {
-    m_transform.setPosition(0.0,0.0,-3.0);
+    m_transform.setPosition(0.0f,0.0f,-3.0f);
     loadMatricesToShader();
     ngl::VAOPrimitives::draw("cone");
   } // and before a pop
@@ -193,7 +191,7 @@ void NGLScene::drawScene(const std::string &_shader)
 
   m_transform.reset();
   {
-    m_transform.setPosition(-3.0,0.5,-3.0);
+    m_transform.setPosition(-3.0f,0.5f,-3.0f);
     loadMatricesToShader();
     ngl::VAOPrimitives::draw("tetrahedron");
   } // and before a pop
@@ -201,7 +199,7 @@ void NGLScene::drawScene(const std::string &_shader)
 
   m_transform.reset();
   {
-    m_transform.setPosition(3.0,0.5,-3.0);
+    m_transform.setPosition(3.0f,0.5f,-3.0f);
     loadMatricesToShader();
     ngl::VAOPrimitives::draw("octahedron");
   } // and before a pop
@@ -209,15 +207,15 @@ void NGLScene::drawScene(const std::string &_shader)
 
   m_transform.reset();
   {
-    m_transform.setPosition(0.0,0.5,-6.0);
+    m_transform.setPosition(0.0f,0.5f,-6.0f);
     loadMatricesToShader();
     ngl::VAOPrimitives::draw("football");
   } // and before a pop
 
   m_transform.reset();
   {
-    m_transform.setPosition(-3.0,0.5,-6.0);
-    m_transform.setRotation(0,180,0);
+    m_transform.setPosition(-3.0f,0.5f,-6.0f);
+    m_transform.setRotation(0.0f,180.0f,0.0f);
     loadMatricesToShader();
     ngl::VAOPrimitives::draw("disk");
   } // and before a pop
@@ -249,16 +247,16 @@ void NGLScene::drawScene(const std::string &_shader)
 
   m_transform.reset();
   {
-    m_transform.setPosition(-2.5,-0.5,1.0);
-    m_transform.setScale(0.1,0.1,0.1);
+    m_transform.setPosition(-2.5f,-0.5f,1.0f);
+    m_transform.setScale(0.1f,0.1f,0.1f);
     loadMatricesToShader();
     ngl::VAOPrimitives::draw("buddah");
   } // and before a pop
 
   m_transform.reset();
   {
-    m_transform.setPosition(2.5,-0.5,1.0);
-    m_transform.setScale(0.1,0.1,0.1);
+    m_transform.setPosition(2.5f,-0.5f,1.0f);
+    m_transform.setScale(0.1f,0.1f,0.1f);
     loadMatricesToShader();
     ngl::VAOPrimitives::draw("bunny");
   } // and before a pop
@@ -266,7 +264,7 @@ void NGLScene::drawScene(const std::string &_shader)
 
   m_transform.reset();
   {
-    m_transform.setPosition(0.0,-0.5,0.0);
+    m_transform.setPosition(0.0f,-0.5f,0.0f);
     loadMatricesToShader();
     ngl::VAOPrimitives::draw("plane");
   } // and before a pop
@@ -393,9 +391,8 @@ void NGLScene::keyPressEvent(QKeyEvent *_event)
 void NGLScene::updateLight()
 {
 
-  ngl::ShaderLib::use("Phong");
   // change the light angle
-  m_lightAngle+=0.1;
+  m_lightAngle+=0.1f;
 
   // now set this value and load to the shader
   m_lightPos.set(ngl::Vec3(4.0*cosf(m_lightAngle),2.0f,4.0f*sinf(m_lightAngle)));
