@@ -65,6 +65,8 @@ void NGLScene::initializeGL()
   ngl::Vec3 up(0.0f, 1.0f, 0.0f);
   // now load to our new camera
   m_view = ngl::lookAt(from, to, up);
+  m_project = ngl::perspective(45.0f, 1024.0f/720.0f, 0.05f, 350.0f);
+
   ngl::ShaderLib::setUniform("camPos", from);
   // now a light
   m_lightPos.set(0.0, 2.0f, 2.0f, 1.0f);
@@ -88,8 +90,6 @@ void NGLScene::initializeGL()
   ngl::VAOPrimitives::createDisk("disk", 0.8f, 120);
   ngl::VAOPrimitives::createTorus("torus", 0.15f, 0.4f, 40, 40);
   ngl::VAOPrimitives::createTrianglePlane("plane", 14, 14, 80, 80, ngl::Vec3(0, 1, 0));
-  // as re-size is not explicitly called we need to do this.
-  glViewport(0, 0, width(), height());
   // this timer is going to trigger an event every 40ms which will be processed in the
   //
   m_lightTimer = startTimer(40);
